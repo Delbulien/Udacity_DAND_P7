@@ -11789,7 +11789,8 @@ div#notebook {
 <p>I made these decisions for the following reasons:</p>
 <ul>
 <li>Number of cookies (Number of unique users to visit the course overview page): Since the unit of diversion is the cookies, they must be evenly distributed between the control and the experiment groups. Therefore, I will use this metric as an invariant.</li>
-<li>Number of user-ids (Number of users who enroll in the free trial): This metric is not an invariant since the experiment is expected to provide warning to the user and reduce the number of enrollment from people who can't commit enough hours. This metric can't be used as evaluation metric because it won't give information on the purpose of the experiment: How many of those users will continue past the free trial.</li>
+<li>Number of user-ids (Number of users who enroll in the free trial): This metric is not an invariant since the experiment is expected to provide warning to the user and reduce the number of enrollment from people who can't commit enough hours. 
+This metric could potentially be used as an evaluation metrics because it is expected to see a difference between the experiment and the control group. However, since it is an absolute value, it is difficult to have an a-priori idea of the distribution that can be expected for this value. The use of this metric would make the experiment more difficult to analyse. Since other metrics are possible, I would not choose this one.</li>
 <li>Number of clicks (Number of unique cookies to click the "Start free trial" button):Since the experiment happen after the click on the "Start free trial", this metric can be used as an invariant.</li>
 <li>Click-through-probility (Number of unique cookies to click the "Start free trial" button divided by the number of unique cookies to view the course overview page): This metric is based on 2 metrics that are invariants. Therfore it is an invariant.</li>
 <li>Gross conversion (Number of user-ids to complete checkout and enroll in the free trial divided by the number of unique cookies to click the "Start free trial" button): This metric is an evaluation metric because the ratio difference between the experiment and the control group will give the impact of the warming on the people who decide to enroll in the free trial.</li>
@@ -11799,7 +11800,7 @@ div#notebook {
 <p>The results I expect for my chosen evaluation metrics are the following:</p>
 <ul>
 <li>Gross conversion: if the experiment works as expected, this metric should be lower for the experiment group than for the control group. Indeed, once the pop-up as been displayed to the visitor, I expect, he will enroll only if he evaluates that he could commit the requested amount of time. Therefore, less visitors should enroll in the experiment group.</li>
-<li>Net conversion: I expect the net conversion to remain the same between the experiment and the control group. It measures how many people remains enroll after the 14-day boundary over the number of unique cookies to click the "Start free trial". In the experiment group, enrolled people have been warmed, therefore there will be less enrollment but it means also that more of them should remain enrolled after the 14-day boundary. In the control group, people are not warned, therefore there will be more enrollment but it means that more of them will leave the course in-between. At the end, the final number of people remaining engaged over the number of click on the "Start free trial" should be the same between the experiment and the control group. The advantage for Udacity is that udacity coaches will be less solicitated by people that are in the free trial period.</li>
+<li>Net conversion: I expect the net conversion to remain the same or to increase between the experiment and the control group. It measures how many people remains enroll after the 14-day boundary over the number of unique cookies to click the "Start free trial". In the experiment group, enrolled people have been warned, therefore there will be less enrollment but it means also that more of them should remain enrolled after the 14-day boundary. In the control group, people are not warned, therefore there will be more enrollment but it means that more of them will leave the course in-between. At the end, the final number of people remaining engaged over the number of click on the "Start free trial" should be the same between the experiment and the control group. The advantage for Udacity is that udacity coaches will be less solicitated by people that are in the free trial period and that might leave early because they can't commit to enough learning hours. The coachs will then have more time to help the people who commit to enough hours during the 14-days boundary and it might result that a higher number remain enrolled.</li>
 </ul>
 <h3 id="Measuring-Standard-Deviation">Measuring Standard Deviation<a class="anchor-link" href="#Measuring-Standard-Deviation">&#182;</a></h3>
 </div>
@@ -11861,12 +11862,12 @@ Standard deviation of Net conversion for a sample size of 5000 cookies: 0.0156
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>The standard deviation for my evaluation metrics for a sample size of 5000 cookies are:</p>
+<p>The two evaluation metrics are probabilities. Their distributions are likely to follow Binomial distributions. The standard deviation for my evaluation metrics for a sample size of 5000 cookies are:</p>
 <ul>
 <li>0.0202 for the Gross conversion</li>
 <li>0.0156 for the Net conversion  </li>
 </ul>
-<p>The two evaluation metric are probability. Their distributions are likely to follow a Binomial distribution. Therefore I expect the analytical estimate to be comparable to the empirical variability.</p>
+<p>The unit of diversion is a cooky. The units of analysis for both evaluation metrics are also cookies (the denominator of the metrics). Therefore the variability computed analitically is likely to a be very close to the empirically computed variability.</p>
 <h3 id="Sizing">Sizing<a class="anchor-link" href="#Sizing">&#182;</a></h3><h4 id="Number-of-Samples-vs.-Power">Number of Samples vs. Power<a class="anchor-link" href="#Number-of-Samples-vs.-Power">&#182;</a></h4>
 </div>
 </div>
@@ -11933,14 +11934,12 @@ I get the following result:</p>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span></span><span class="c1"># fraction of traffic to be diverted for a one month experiment</span>
-<span class="n">f</span><span class="o">=</span><span class="mf">685325.</span><span class="o">/</span><span class="p">(</span><span class="mi">40000</span><span class="o">*</span><span class="mi">30</span><span class="p">)</span><span class="o">*</span><span class="mi">100</span>
+<span class="n">f</span><span class="o">=</span><span class="mf">1.</span>
 
-<span class="k">print</span> <span class="s2">&quot;The fraction of the traffic for a 30 days experiment is equal to </span><span class="si">%.2f%%</span><span class="s2">&quot;</span><span class="o">%</span><span class="k">f</span>
+<span class="c1"># Number of days with a fraction of f</span>
+<span class="n">Nd</span><span class="o">=</span><span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="mf">685325.</span><span class="o">/</span><span class="p">(</span><span class="mi">40000</span><span class="o">*</span><span class="n">f</span><span class="p">))</span>
 
-<span class="c1"># Number of days with a fraction of 0.5</span>
-<span class="n">Nd</span><span class="o">=</span><span class="mf">685325.</span><span class="o">/</span><span class="p">(</span><span class="mi">40000</span><span class="o">*</span><span class="mf">0.5</span><span class="p">)</span>
-
-<span class="k">print</span> <span class="s2">&quot;The number of days for a fraction of divertion equal to 0.5 days is equal to </span><span class="si">%.2f</span><span class="s2">&quot;</span><span class="o">%</span><span class="k">Nd</span>
+<span class="k">print</span> <span class="s2">&quot;The number of days for a fraction of divertion equal to </span><span class="si">%.2f</span><span class="s2"> days is equal to </span><span class="si">%i</span><span class="s2">&quot;</span><span class="o">%</span><span class="p">(</span><span class="n">f</span><span class="p">,</span><span class="n">Nd</span><span class="p">)</span>
 </pre></div>
 
 </div>
@@ -11955,8 +11954,7 @@ I get the following result:</p>
 <div class="prompt"></div>
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>The fraction of the traffic for a 30 days experiment is equal to 57.11%
-The number of days for a fraction of divertion equal to 0.5 days is equal to 34.27
+<pre>The number of days for a fraction of divertion equal to 1.00 days is equal to 18
 </pre>
 </div>
 </div>
@@ -11970,9 +11968,15 @@ The number of days for a fraction of divertion equal to 0.5 days is equal to 34.
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>In order to get an idea of the fraction of traffic that I would divert for the experiment, I considered a reasonable amount of time (around one month). It means that the fraction of traffic $f$  that needs to be diverted verify the relation: $f*40000*30=685325$. It gives $f=\frac{685325}{40000*30}$ which is around $57\%$.</p>
-<p>As an answer to the question, I considered a fraction of 50% (half of the traffic). It gives a number of days equal to $N_d=\frac{685325}{40000*0.5}$ which is equal to $N_d=34.27$. As the number of days is a integer value, the experiment should be done on 35 days for a fraction of divertion equal to 0.5.</p>
-<p>That the experiment consist only to warn users of a necessary commitment for the training, there is no risk for Udacity and the fraction can be chosen depending on the duration expected.</p>
+<p>For this experiment, I would divert the complete traffic. It gives a number of 18 days for the experiment.</p>
+<p>It is acceptable to divert the complete traffic for the following reasons:</p>
+<ul>
+<li>The risk for the participant is very minor. It consists only of a warning to the user which can't lead to any harm in any of the following categories: physical, psychological and emotional, social, and economic.</li>
+<li>In term of benefit, the participant is warned and it can prevent him to lose time and being frustrated.</li>
+<li>In term of alternative, the participant is asked to enter a number of hours. However the user has the possibility to register if he say that he will commit to enough hours.</li>
+<li>The data sensitivity requested by this experiment is very low. It asks a number of hours that the users can commit. Even if the user can be identified based on the cooky, a number of hour committed to learning is not sensitive.</li>
+</ul>
+<p>The only risk would be that the warning results in a significant decrease of net conversion and then loss of moneyfor udacity because of the experiment. A decrease of the Net conversion of 0.75% would result in a loss of money of at least 40000\$ ($0.0075<em>0.08</em>685325/2*200=41119 with 200\$ being the fee for one month subscription). At this point, it is up to the decision makers to decide wether to do the experiment or not.</p>
 <h2 id="Experiment-Analysis">Experiment Analysis<a class="anchor-link" href="#Experiment-Analysis">&#182;</a></h2><h3 id="Sanity-Checks">Sanity Checks<a class="anchor-link" href="#Sanity-Checks">&#182;</a></h3>
 </div>
 </div>
@@ -12298,7 +12302,7 @@ Number of trials: 23
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h4 id="Summary">Summary<a class="anchor-link" href="#Summary">&#182;</a></h4><p>I didn't use the Bonferroni correction because only 2 metrics are used for the evaluation of the experiment. Therefore it is not likely that to see a significant difference just by chance.<br>
+<h4 id="Summary">Summary<a class="anchor-link" href="#Summary">&#182;</a></h4><p>The Bonferroni correction is not required since both evaluation metrics need to match the expectations. As the expectation for both metrics need to be matched to launch the change, there is no need to use the Bonferroni correction in order to reduce the risk of having one of the metric matching the expectation by chance. Even in this case the experiment wouldn't be launched.<br>
 The effect size hypothesis tests and the sign tests are coherents and give the same conclusions.</p>
 
 </div>
@@ -12309,12 +12313,12 @@ The effect size hypothesis tests and the sign tests are coherents and give the s
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="Recommendation">Recommendation<a class="anchor-link" href="#Recommendation">&#182;</a></h3><p>The effect of the experiment seems to have exactly the expected impact:</p>
+<h3 id="Recommendation">Recommendation<a class="anchor-link" href="#Recommendation">&#182;</a></h3><p>The experiment gives the following results:</p>
 <ul>
-<li>less people enroll for the free trial: the Gross conversion is statistically and practically lower which means that the warming on the mandatory commitment has the impact expectted.</li>
-<li>the number of people remaining enrolled after the 14-days is not significantly impacted with a confidence interval of 95%: the Net conversion is not statistically different in the experiment and in the control group. However, with a reduced confidence interval (50% for example), the experiment would show a statistical significant difference on the Net conversion.</li>
+<li>less people enroll for the free trial: the Gross conversion is statistically and practically lower which means that the warming on the mandatory commitment has the expected impact.</li>
+<li>the impact on the number of people remaining enrolled after the 14-days is neither practically or statistically significant. The practical level of significance (-0.0075) is included in the confidence interval [-0.0116,0.0019].   </li>
 </ul>
-<p>Because of the statistically significant difference on the Net conversion for the 50% confidence interval, even if the difference might not be practically significant, I would recommend to not apply the change to the udacity website.</p>
+<p>There is the a risk that the net conversion is significantly decreased because of the experiment. As a conclusion, I would recommend to not apply the change to the udacity website.</p>
 
 </div>
 </div>
