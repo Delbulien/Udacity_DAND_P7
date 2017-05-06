@@ -11784,6 +11784,7 @@ div#notebook {
 <p>As evaluation metrics, I choose:</p>
 <ul>
 <li>Gross conversion</li>
+<li>Retention </li>
 <li>Net conversion</li>
 </ul>
 <p>I made these decisions for the following reasons:</p>
@@ -11794,12 +11795,13 @@ This metric could potentially be used as an evaluation metrics because it is exp
 <li>Number of clicks (Number of unique cookies to click the "Start free trial" button):Since the experiment happen after the click on the "Start free trial", this metric can be used as an invariant.</li>
 <li>Click-through-probility (Number of unique cookies to click the "Start free trial" button divided by the number of unique cookies to view the course overview page): This metric is based on 2 metrics that are invariants. Therfore it is an invariant.</li>
 <li>Gross conversion (Number of user-ids to complete checkout and enroll in the free trial divided by the number of unique cookies to click the "Start free trial" button): This metric is an evaluation metric because the ratio difference between the experiment and the control group will give the impact of the warming on the people who decide to enroll in the free trial.</li>
-<li>Retention (Number of user-ids to remain enroll past the 14-day boundary divided by the number of user-ids to complete checkout): This metric could also be considered as an evaluation metrics since it measures the impact of the experiment on the ratio of users remaining enrolled pas the 14-day boundary. However, I will not use this evaluation metric since it is equal to $ \frac{Net\ conversion}{Gross\ conversion}$.</li>
+<li>Retention (Number of user-ids to remain enroll past the 14-day boundary divided by the number of user-ids to complete checkout): This metric could also be considered as an evaluation metrics since it measures the impact of the experiment on the ratio of users remaining enrolled pas the 14-day boundary.  </li>
 <li>Net conversion (Number of user-ids to remain enroll past the 14-day boundary divided by the number of unique cookies to click the "Start free trial" button). I choose this metric as an evaluation metric since it give the impact of the experiment on the people who remain enroll past the 14-day boundary.</li>
 </ul>
 <p>The results I expect for my chosen evaluation metrics are the following:</p>
 <ul>
 <li>Gross conversion: if the experiment works as expected, this metric should be lower for the experiment group than for the control group. Indeed, once the pop-up as been displayed to the visitor, I expect, he will enroll only if he evaluates that he could commit the requested amount of time. Therefore, less visitors should enroll in the experiment group.</li>
+<li>Retention: If only warned people enroll in the 14-day trial, I expect that more of them will remain after the 14-day boundary. Therefore this metric should be higher in the experiment group than in the control group.</li>
 <li>Net conversion: I expect the net conversion to remain the same or to increase between the experiment and the control group. It measures how many people remains enroll after the 14-day boundary over the number of unique cookies to click the "Start free trial". In the experiment group, enrolled people have been warned, therefore there will be less enrollment but it means also that more of them should remain enrolled after the 14-day boundary. In the control group, people are not warned, therefore there will be more enrollment but it means that more of them will leave the course in-between. At the end, the final number of people remaining engaged over the number of click on the "Start free trial" should be the same between the experiment and the control group. The advantage for Udacity is that udacity coaches will be less solicitated by people that are in the free trial period and that might leave early because they can't commit to enough learning hours. The coachs will then have more time to help the people who commit to enough hours during the 14-days boundary and it might result that a higher number remain enrolled.</li>
 </ul>
 <h3 id="Measuring-Standard-Deviation">Measuring Standard Deviation<a class="anchor-link" href="#Measuring-Standard-Deviation">&#182;</a></h3>
@@ -11808,7 +11810,7 @@ This metric could potentially be used as an evaluation metrics because it is exp
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[1]:</div>
+<div class="prompt input_prompt">In&nbsp;[20]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span></span><span class="kn">import</span> <span class="nn">math</span>
@@ -11819,19 +11821,29 @@ This metric could potentially be used as an evaluation metrics because it is exp
 <span class="n">unique_cookies_per_day</span><span class="o">=</span><span class="mi">5000</span>
 <span class="n">click_through_probability_start_free_trial</span><span class="o">=</span><span class="mf">0.08</span>
 <span class="n">probability_of_enrolling_given_click</span><span class="o">=</span><span class="mf">0.20625</span>
+<span class="n">probability_of_payment_given_enroll</span><span class="o">=</span><span class="mf">0.53</span>
 <span class="n">probability_of_payment_given_click</span><span class="o">=</span><span class="mf">0.1093125</span>
 
 <span class="c1"># Number of click on &quot;Start free trial&quot;</span>
-<span class="n">N</span><span class="o">=</span><span class="n">unique_cookies_per_day</span><span class="o">*</span><span class="n">click_through_probability_start_free_trial</span>
+<span class="n">Nclick</span><span class="o">=</span><span class="n">unique_cookies_per_day</span><span class="o">*</span><span class="n">click_through_probability_start_free_trial</span>
+
+<span class="c1"># Number of enrollment</span>
+<span class="n">Nenroll</span><span class="o">=</span><span class="n">Nclick</span><span class="o">*</span><span class="n">probability_of_enrolling_given_click</span>
 
 <span class="c1"># Evaluation of standard deviation of binomial distribution B(p,N)</span>
 <span class="n">standard_dev_gross_conversion</span><span class="o">=</span><span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span>
-    <span class="n">probability_of_enrolling_given_click</span><span class="o">*</span><span class="p">(</span><span class="mf">1.</span><span class="o">-</span><span class="n">probability_of_enrolling_given_click</span><span class="p">)</span><span class="o">/</span><span class="n">N</span><span class="p">)</span>
+    <span class="n">probability_of_enrolling_given_click</span><span class="o">*</span><span class="p">(</span><span class="mf">1.</span><span class="o">-</span><span class="n">probability_of_enrolling_given_click</span><span class="p">)</span><span class="o">/</span><span class="n">Nclick</span><span class="p">)</span>
+
+<span class="n">standard_dev_retention</span><span class="o">=</span><span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span>
+    <span class="n">probability_of_payment_given_enroll</span><span class="o">*</span><span class="p">(</span><span class="mf">1.</span><span class="o">-</span><span class="n">probability_of_payment_given_enroll</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="n">Nenroll</span><span class="p">))</span>
 
 <span class="n">standard_dev_net_conversion</span><span class="o">=</span><span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span>
-    <span class="n">probability_of_payment_given_click</span><span class="o">*</span><span class="p">(</span><span class="mf">1.</span><span class="o">-</span><span class="n">probability_of_payment_given_click</span><span class="p">)</span><span class="o">/</span><span class="n">N</span><span class="p">)</span>
+    <span class="n">probability_of_payment_given_click</span><span class="o">*</span><span class="p">(</span><span class="mf">1.</span><span class="o">-</span><span class="n">probability_of_payment_given_click</span><span class="p">)</span><span class="o">/</span><span class="n">Nclick</span><span class="p">)</span>
+
+
 
 <span class="k">print</span> <span class="s2">&quot;Standard deviation of Gross conversion for a sample size of 5000 cookies: </span><span class="si">%.4f</span><span class="s2">&quot;</span><span class="o">%</span><span class="k">standard_dev_gross_conversion</span>
+<span class="k">print</span> <span class="s2">&quot;Standard deviation of Retention for a sample size of 5000 cookies: </span><span class="si">%.4f</span><span class="s2">&quot;</span><span class="o">%</span><span class="k">standard_dev_retention</span>
 <span class="k">print</span> <span class="s2">&quot;Standard deviation of Net conversion for a sample size of 5000 cookies: </span><span class="si">%.4f</span><span class="s2">&quot;</span><span class="o">%</span><span class="k">standard_dev_net_conversion</span>
 </pre></div>
 
@@ -11848,6 +11860,7 @@ This metric could potentially be used as an evaluation metrics because it is exp
 
 <div class="output_subarea output_stream output_stdout output_text">
 <pre>Standard deviation of Gross conversion for a sample size of 5000 cookies: 0.0202
+Standard deviation of Retention for a sample size of 5000 cookies: 0.0549
 Standard deviation of Net conversion for a sample size of 5000 cookies: 0.0156
 </pre>
 </div>
@@ -11862,31 +11875,43 @@ Standard deviation of Net conversion for a sample size of 5000 cookies: 0.0156
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>The two evaluation metrics are probabilities. Their distributions are likely to follow Binomial distributions. The standard deviation for my evaluation metrics for a sample size of 5000 cookies are:</p>
+<p>The three evaluation metrics are probabilities. Their distributions are likely to follow Binomial distributions. The standard deviation for my evaluation metrics for a sample size of 5000 cookies are:</p>
 <ul>
 <li>0.0202 for the Gross conversion</li>
+<li>0.0549 for the Retention</li>
 <li>0.0156 for the Net conversion  </li>
 </ul>
-<p>The unit of diversion is a cooky. The units of analysis for both evaluation metrics are also cookies (the denominator of the metrics). Therefore the variability computed analitically is likely to a be very close to the empirically computed variability.</p>
+<p>The unit of diversion is a cooky. The units of analysis for Gross Conversion and Net Conversion are also cookies (the denominator of the metrics). Therefore the variability computed analitically is likely to a be very close to the empirically computed variability. The units of analysis for the Retention is the number of user-ids. As the unit of diversion and the unit of analysis are not the same, the empirical variability may be much higher than the analytical estimate.</p>
 <h3 id="Sizing">Sizing<a class="anchor-link" href="#Sizing">&#182;</a></h3><h4 id="Number-of-Samples-vs.-Power">Number of Samples vs. Power<a class="anchor-link" href="#Number-of-Samples-vs.-Power">&#182;</a></h4>
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[2]:</div>
+<div class="prompt input_prompt">In&nbsp;[21]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span></span><span class="c1"># Number of sample for one group for each metric:</span>
+<span class="c1"># Gross Conversion</span>
 <span class="n">N1</span><span class="o">=</span><span class="mi">25835</span>
-<span class="n">N2</span><span class="o">=</span><span class="mi">27413</span>
+<span class="c1"># Retention</span>
+<span class="n">N2</span><span class="o">=</span><span class="mi">39115</span>
+<span class="c1"># Net Conversion</span>
+<span class="n">N3</span><span class="o">=</span><span class="mi">27413</span>
 
-<span class="c1"># Number of sample for both groups:</span>
-<span class="n">Ns</span><span class="o">=</span><span class="mi">2</span><span class="o">*</span><span class="nb">max</span><span class="p">(</span><span class="mi">25835</span><span class="p">,</span><span class="mi">27413</span><span class="p">)</span>
+<span class="c1"># Number of pageviews necessary for each evaluation metrics</span>
+<span class="n">Np1</span><span class="o">=</span><span class="n">N1</span><span class="o">/</span><span class="n">click_through_probability_start_free_trial</span>
+<span class="n">Np2</span><span class="o">=</span><span class="n">N2</span><span class="o">/</span><span class="p">(</span><span class="n">click_through_probability_start_free_trial</span><span class="o">*</span><span class="n">probability_of_enrolling_given_click</span><span class="p">)</span>
+<span class="n">Np3</span><span class="o">=</span><span class="n">N3</span><span class="o">/</span><span class="n">click_through_probability_start_free_trial</span>
 
-<span class="c1"># Number of pageviews</span>
-<span class="n">N</span><span class="o">=</span><span class="n">Ns</span><span class="o">/</span><span class="mf">0.08</span>
+<span class="k">print</span> <span class="s2">&quot;The number of pageviews necessary for the Gross conversion (one group) is </span><span class="si">%i</span><span class="s2">&quot;</span><span class="o">%</span><span class="k">Np1</span>
+<span class="k">print</span> <span class="s2">&quot;The number of pageviews necessary for the Retention (one group) is </span><span class="si">%i</span><span class="s2">&quot;</span><span class="o">%</span><span class="k">Np2</span>
+<span class="k">print</span> <span class="s2">&quot;The number of pageviews necessary for the Net conversion (one group) is </span><span class="si">%i</span><span class="s2">&quot;</span><span class="o">%</span><span class="k">Np3</span>
 
+<span class="c1"># Number of sample for the experiment for both groups:</span>
+<span class="n">N</span><span class="o">=</span><span class="mi">2</span><span class="o">*</span><span class="nb">max</span><span class="p">(</span><span class="n">Np1</span><span class="p">,</span><span class="n">Np2</span><span class="p">,</span><span class="n">Np3</span><span class="p">)</span>
+
+<span class="k">print</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
 <span class="k">print</span> <span class="s2">&quot;The number of pageviews necessary for the experiment is </span><span class="si">%i</span><span class="s2">&quot;</span><span class="o">%</span><span class="k">N</span>
 </pre></div>
 
@@ -11902,7 +11927,12 @@ Standard deviation of Net conversion for a sample size of 5000 cookies: 0.0156
 <div class="prompt"></div>
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>The number of pageviews necessary for the experiment is 685325
+<pre>The number of pageviews necessary for the Gross conversion (one group) is 322937
+The number of pageviews necessary for the Retention (one group) is 2370606
+The number of pageviews necessary for the Net conversion (one group) is 342662
+
+
+The number of pageviews necessary for the experiment is 4741212
 </pre>
 </div>
 </div>
@@ -11916,30 +11946,44 @@ Standard deviation of Net conversion for a sample size of 5000 cookies: 0.0156
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>Since there are only 2 evaluations metrics, I will not use the Bonferroni correction during my analysis phase.</p>
-<p>In order to compute the number of click on the "Start free trial" button that will be needed, I used the calculator available at the address: <a href="http://www.evanmiller.org/ab-testing/sample-size.html">Calculator</a>. 
-I get the following result:</p>
+<p>I will not use the Bonferroni correction during my analysis phase. In order to compute the number of clicks on the "Start free trial" button that will be needed, I used the calculator available at the address: <a href="http://www.evanmiller.org/ab-testing/sample-size.html">Calculator</a>. 
+I get the following results:</p>
 <ul>
 <li>25835 samples necessary for the Gross conversion to identify a 1% variation with $\alpha=0.05$ and $\beta=0.2$.</li>
-<li>27413 samples necessary for the Net conversion to identify a 1% variation with $\alpha=0.05$ and $\beta=0.2$.</li>
+<li>39115 samples necessary for the Gross conversion to identify a 1% variation with $\alpha=0.05$ and $\beta=0.2$.</li>
+<li>27413 samples necessary for the Net conversion to identify a 0.75% variation with $\alpha=0.05$ and $\beta=0.2$.</li>
 </ul>
-<p>In order to be able to get a proper evaluation of the evolution of both metrics, I will consider the maximum value of the figures obtained with the calculator. This number of sample is for one group. Since there are 2 groups and the pageviews will be balanced between both group, the number of samples for both groups is: $max(27413,25835)*2$. As there is Click-through-probability on "Start free trial" equal to $0.08$, the number of pageviews necessary is equal to: $N=\frac{max(27413,25835)*2}{0.08}$. It gives 685325 pageviews.</p>
+<p>In order to be able to get a proper evaluation of the evolution of both metrics, I will consider the maximum value of the figures obtained with the calculator. This number of sample is for one group. For the Gross conversion and the Net convertion, only 8% of the cookies will lead to a click on the "strat free trial" button. For the Retention, as the unit of analysis is the number of user-ids, an estimation of the percentage of cookies leading to an enrollment is: $0.08*0,20625$. It gives the following number of cookies for one group for each of the metrics:</p>
+<ul>
+<li>322937 for the Gross Conversion  </li>
+<li>2370606 for the Retention</li>
+<li>342662 for the Net Conversion<br>
+Since there are 2 groups and the cookies will be balanced between both group, the number of samples necessary for both groups for all the metrics is equal to $N=2*max(322937,2370606,342662). It gives 4741212 cookies.</li>
+</ul>
 <h4 id="Duration-vs.-Exposure">Duration vs. Exposure<a class="anchor-link" href="#Duration-vs.-Exposure">&#182;</a></h4>
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[3]:</div>
+<div class="prompt input_prompt">In&nbsp;[22]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span></span><span class="c1"># fraction of traffic to be diverted for a one month experiment</span>
 <span class="n">f</span><span class="o">=</span><span class="mf">1.</span>
 
-<span class="c1"># Number of days with a fraction of f</span>
-<span class="n">Nd</span><span class="o">=</span><span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="mf">685325.</span><span class="o">/</span><span class="p">(</span><span class="mi">40000</span><span class="o">*</span><span class="n">f</span><span class="p">))</span>
+<span class="c1"># Number of days with a fraction of f for all 3 metrics</span>
+<span class="n">N</span><span class="o">=</span><span class="mi">2</span><span class="o">*</span><span class="nb">max</span><span class="p">(</span><span class="n">Np1</span><span class="p">,</span><span class="n">Np2</span><span class="p">,</span><span class="n">Np3</span><span class="p">)</span>
+<span class="n">Nd_3metrics</span><span class="o">=</span><span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">N</span><span class="o">/</span><span class="p">(</span><span class="mi">40000</span><span class="o">*</span><span class="n">f</span><span class="p">))</span>
 
-<span class="k">print</span> <span class="s2">&quot;The number of days for a fraction of divertion equal to </span><span class="si">%.2f</span><span class="s2"> days is equal to </span><span class="si">%i</span><span class="s2">&quot;</span><span class="o">%</span><span class="p">(</span><span class="n">f</span><span class="p">,</span><span class="n">Nd</span><span class="p">)</span>
+<span class="k">print</span> <span class="s2">&quot;The number of days for a fraction of divertion equal to </span><span class="si">%.2f</span><span class="s2"> is equal to </span><span class="si">%i</span><span class="s2">&quot;</span><span class="o">%</span><span class="p">(</span><span class="n">f</span><span class="p">,</span><span class="n">Nd_3metrics</span><span class="p">)</span>
+
+<span class="c1"># Number of days with a fraction of f for Gross conversion and Net conversion</span>
+<span class="n">N</span><span class="o">=</span><span class="mi">2</span><span class="o">*</span><span class="nb">max</span><span class="p">(</span><span class="n">Np1</span><span class="p">,</span><span class="n">Np3</span><span class="p">)</span>
+<span class="k">print</span> <span class="s2">&quot;The number of cookies necessary for the experiment is </span><span class="si">%i</span><span class="s2">&quot;</span><span class="o">%</span><span class="k">N</span>
+<span class="n">Nd</span><span class="o">=</span><span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">N</span><span class="o">/</span><span class="p">(</span><span class="mi">40000</span><span class="o">*</span><span class="n">f</span><span class="p">))</span>
+
+<span class="k">print</span> <span class="s2">&quot;The number of days for a fraction of divertion equal to </span><span class="si">%.2f</span><span class="s2"> is equal to </span><span class="si">%i</span><span class="s2">&quot;</span><span class="o">%</span><span class="p">(</span><span class="n">f</span><span class="p">,</span><span class="n">Nd</span><span class="p">)</span>
 </pre></div>
 
 </div>
@@ -11954,7 +11998,9 @@ I get the following result:</p>
 <div class="prompt"></div>
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>The number of days for a fraction of divertion equal to 1.00 days is equal to 18
+<pre>The number of days for a fraction of divertion equal to 1.00 is equal to 119
+The number of cookies necessary for the experiment is 685325
+The number of days for a fraction of divertion equal to 1.00 is equal to 18
 </pre>
 </div>
 </div>
@@ -11968,7 +12014,7 @@ I get the following result:</p>
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>For this experiment, I would divert the complete traffic. It gives a number of 18 days for the experiment.</p>
+<p>For this experiment, I would divert the complete traffic. It gives a number of 119 days for the experiment. As it not acceptable for Udacity to make an experiment for so long, the Retention, which is the evaluation metric leading to such along time, will be excluded from the evaluation metrics. With only Gross conversion and Net Conversion as evaluation metrics, the experiment requires 685325 cookies which will be obtained in 18 days.</p>
 <p>It is acceptable to divert the complete traffic for the following reasons:</p>
 <ul>
 <li>The risk for the participant is very minor. It consists only of a warning to the user which can't lead to any harm in any of the following categories: physical, psychological and emotional, social, and economic.</li>
@@ -11976,14 +12022,14 @@ I get the following result:</p>
 <li>In term of alternative, the participant is asked to enter a number of hours. However the user has the possibility to register if he say that he will commit to enough hours.</li>
 <li>The data sensitivity requested by this experiment is very low. It asks a number of hours that the users can commit. Even if the user can be identified based on the cooky, a number of hour committed to learning is not sensitive.</li>
 </ul>
-<p>The only risk would be that the warning results in a significant decrease of net conversion and then loss of moneyfor udacity because of the experiment. A decrease of the Net conversion of 0.75% would result in a loss of money of at least 40000\$ ($0.0075<em>0.08</em>685325/2*200=41119 with 200\$ being the fee for one month subscription). At this point, it is up to the decision makers to decide wether to do the experiment or not.</p>
+<p>The only risk would be that the warning results in a significant decrease of net conversion and then loss of money for udacity because of the experiment. A decrease of the Net conversion of 0.75% would result in a loss of money of at least 40000\$ ($0.0075<em>0.08</em>685325/2*200=41119$ with 200\$ being the fee for one month subscription). At this point, it is up to the decision makers to decide wether to do the experiment or not.</p>
 <h2 id="Experiment-Analysis">Experiment Analysis<a class="anchor-link" href="#Experiment-Analysis">&#182;</a></h2><h3 id="Sanity-Checks">Sanity Checks<a class="anchor-link" href="#Sanity-Checks">&#182;</a></h3>
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[4]:</div>
+<div class="prompt input_prompt">In&nbsp;[23]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
@@ -12126,7 +12172,7 @@ Observed difference of click-through-probability is -0.0001
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[5]:</div>
+<div class="prompt input_prompt">In&nbsp;[24]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span></span><span class="c1"># Remove lines with NaN for evaluation Metrics</span>
@@ -12221,7 +12267,7 @@ Upper Bound for difference of Net Conversion difference is 0.0019
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[6]:</div>
+<div class="prompt input_prompt">In&nbsp;[25]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
